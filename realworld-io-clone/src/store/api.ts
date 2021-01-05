@@ -7,8 +7,6 @@ export const conduitAPI = axios.create({
 
 //jwt - jason web token
 export function setJWT(jwt: string){
-    //axios request config - conduitAPI is same as axios.create() 
-    //axios.defaults.baseURL = axios.defaults.common...etc
     //axios.defaults.headers.common['Authorization'] = AUTH_TOKEN;
     conduitAPI.defaults.headers.common["Authorization"] = `Token ${jwt}`
 }
@@ -18,33 +16,14 @@ export function clearJWT(){
 }
 
 //API CALLS
-//POST /api/users/login
-// {
-//     "user": {
-//        ...
-//     }
-//   }
 
 //type UserSubmit from models.d.ts
 //async returns a promise
 //Return type is User Response from models.d.ts
 //function may return undefined if try fails
-// export async function loginUser(userSubmission: UserSubmit): Promise<UserResponse | undefined> { //
-//     try {
-//         const response = await axios.post('/users/login', {
-//             //user object from response
-//             user
-//         })
-//       return (response.data as UserResponse);  
-//     } catch(e){
-//         console.error(e)
-//     }
-// }
-
 export async function loginUser(user: UserSubmit): Promise<User | undefined> {
     try {
         const response = await conduitAPI.post('/users/login', {user})
-        //console.log(response.data.user.username)
         return (response.data as UserResponse).user
     } catch(e){
         console.error(e.message)
