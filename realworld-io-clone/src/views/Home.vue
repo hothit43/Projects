@@ -14,15 +14,22 @@
                 <div class="feed-toggle">
                 <ul class="nav nav-pills outline-active">
                     <li class="nav-item">
-                    <a class="nav-link disabled" href="">Your Feed</a>
+                    <a @click.prevent="feedArticles()" 
+                    :class="['nav-link', {'active': followList}, {'disabled': !followFeed[0] && !username}]"
+                    :style="[!followFeed[0] && !username ? {'pointer-events' : 'none'} : '']"
+                    >Your Feed</a>
                     </li>
                     <li class="nav-item">
-                    <a class="nav-link active" href="">Global Feed</a>
+                    <a @click.prevent="followList = !followList"
+                    :style="[!followFeed[0] ? {'pointer-events' : 'none'} : '']"
+                    :class="['nav-link', {'active': !followList}]">Global Feed</a>
                     </li>
                 </ul>
                 </div>
 
-                <ArticlePreview v-for="article in feed" :article="article" :key="article.slug" />
+                <ArticlePreview v-show="!followList" v-for="article in feed" :article="article" :key="`global-${article.slug}`" />
+                <ArticlePreview v-show="followList" v-for="article in followFeed" :article="article" :key="`following-${article.slug}`" />
+
 
             </div>
 
@@ -53,16 +60,29 @@ import { Vue, Component } from "vue-property-decorator"
 import ArticlePreview from '@/components/article/ArticlePreview.vue'
 import articles from '@/store/modules/articles'
 import { Article } from "@/store/models"
-
+import users from '@/store/modules/users'
 @Component({
     components: {
         ArticlePreview
     }
 })
 export default class extends Vue {
+    followList = false
     feed: Article[] = []
+    followFeed: Article[] = []
+    
+    get username(){
+        return users.username
+    }
+
+    feedArticles(){
+        if(!this.followFeed[0] && this.username) articles.refreshGlobalFeed({feedType: 'feed', username: this.username}).then(() => this.followFeed = articles.feed)
+        this.followList = !this.followList
+    }
     
     created(){
+        if(this.username) articles.refreshGlobalFeed({feedType: 'feed', username: this.username}).then(() => this.followFeed = articles.feed).then(() => this.followList = true)
+
         articles.refreshGlobalFeed({feedType:'global'})
         .then(() => this.feed = articles.feed)
     }

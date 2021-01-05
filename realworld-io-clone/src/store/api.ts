@@ -11,6 +11,7 @@ export function setJWT(jwt: string){
     conduitAPI.defaults.headers.common["Authorization"] = `Token ${jwt}`
 }
 
+//call when user logs out or times out
 export function clearJWT(){
     delete conduitAPI.defaults.headers.common['Authorization']
 }
@@ -51,9 +52,23 @@ export async function fetchUser(): Promise<User | undefined>{
 //GET /api/articles
 //api response with list of articles
 export async function getGlobalFeed(feedType: string, username?: string): Promise<ArticlesResponse> {
-    const filterFeed = feedType === 'user' ? '?author='+username : feedType === 'favorite' ? '?favorited='+username : ''
+    const filterFeed = feedType === 'user' ? '?author='+username : feedType === 'favorite' ? '?favorited='+username : feedType === 'feed' ? '/feed?limit=20' : ''
     const response = await conduitAPI.get(`/articles${filterFeed}`)
     return response.data
+}
+
+//POST /api/profiles/:username/follow
+//Should get a profile - Use Profile | undefined or create new type
+export async function fetchProfileToFollow(username: string){
+    const response = await conduitAPI.post(`/profiles/${username}/follow`)
+    return response.data.profile
+}
+
+//DELETE /api/profiles/:username/follow
+//Shoul get a profile - Use Profile | undefined or create new type
+export async function deleteProfileFromFollow(username: string){
+    const response = await conduitAPI.delete(`/profiles/${username}/follow`)
+    return response.data.profile
 }
 
 

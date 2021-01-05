@@ -10,10 +10,15 @@
                     <p v-if="profile.bio">
                         {{profile.bio}}
                     </p>
-                    <button class="btn btn-sm btn-outline-secondary action-btn">
+                    <button v-if="!profile.following" @click.prevent="follow()" class="btn btn-sm btn-outline-secondary action-btn">
                         <i class="ion-plus-round"></i>
                         &nbsp;
                         Follow {{profile.username}}
+                    </button>
+                    <button v-if="profile.following" @click.prevent="unfollow()" class="btn btn-sm btn-outline-secondary action-btn">
+                        <i class="ion-plus-round"></i>
+                        &nbsp;
+                        Unfollow {{profile.username}}
                     </button>
                 </div>
 
@@ -74,6 +79,15 @@ export default class Profile extends Vue {
 
     get profile(){
         return users.profile
+    }
+
+    follow(){
+        //if (!this.isAuthenticated) return;
+        users.followUser(this.username)
+    }
+
+    unfollow(){
+        users.unfollowUser(this.username)
     }
 
     favoriteArticles(){

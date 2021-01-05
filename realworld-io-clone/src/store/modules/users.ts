@@ -2,7 +2,7 @@ import { UserForUpdate } from './../models.d';
 import { VuexModule, Module, getModule, Action, Mutation } from 'vuex-module-decorators'
 import store from '@/store'
 import {User, Profile, UserSubmit} from '../models'
-import { fetchProfile, fetchUser, loginUser, setJWT, updateUser } from '../api'
+import { deleteProfileFromFollow, fetchProfile, fetchProfileToFollow, fetchUser, loginUser, setJWT, updateUser } from '../api'
 
 //Regular Method without vuex-module-decorator
 // const moduleA = {
@@ -30,6 +30,7 @@ export class UsersModule extends VuexModule {
         //if user exists send user.username else send null
         return this.user && this.user.username || null
     }
+    
 
     @Action({commit: 'setUser'})
     //UserSubmit Type from models.d.ts
@@ -65,17 +66,24 @@ export class UsersModule extends VuexModule {
         return user
     }
 
+    //Follow user
+    @Action({commit: 'setProfile'})
+    async followUser(username: string){
+        const user = await fetchProfileToFollow(username)
+        return user
+    }
+
+    //Unfollow user
+    @Action({commit: 'setProfile'})
+    async unfollowUser(username: string){
+        const user = await deleteProfileFromFollow(username)
+        return user
+    }
+
     //mutate/set above user object
     @Mutation setUser(user: User){this.user = user}
-
-    @Mutation setProfile(profile: Profile){
-        this.profile = profile
-    }
-
-    @Mutation 
-    setSelfProfile(user: User){
-        this.user = user
-    }
+    @Mutation setProfile(profile: Profile){this.profile = profile}
+    @Mutation setSelfProfile(user: User){this.user = user}
 }
 
 

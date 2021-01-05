@@ -5,7 +5,7 @@
                 <img :src="article.author.image" />
             </a>
             <div class="info">
-            <a href="" class="author">{{article.author.username}}</a>
+            <router-link :to="'/@'+article.author.username" class="author">{{article.author.username}}</router-link>
             <span class="date">January 20th</span>
             </div>
             <button class="btn btn-outline-primary btn-sm pull-xs-right">
