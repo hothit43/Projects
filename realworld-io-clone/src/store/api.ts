@@ -1,34 +1,27 @@
 import axios from 'axios'
+//import JwtService from './modules/jwt.service'
 import { User, UserResponse, Profile, ProfileResponse, UserSubmit, ArticlesResponse, UserForUpdate} from './models'
+
+
+//export let errors = {}
 
 export const conduitAPI = axios.create({
     baseURL: 'https://conduit.productionready.io/api'
 })
 
-//jwt - jason web token
-export function setJWT(jwt: string){
-    //axios.defaults.headers.common['Authorization'] = AUTH_TOKEN;
-    conduitAPI.defaults.headers.common["Authorization"] = `Token ${jwt}`
+export function setJWT(token: string | null){
+    conduitAPI.defaults.headers.common["Authorization"] = `Token ${token}`
 }
 
-//call when user logs out or times out
 export function clearJWT(){
     delete conduitAPI.defaults.headers.common['Authorization']
 }
 
-//API CALLS
+export async function loginUser(credentials: UserSubmit): Promise<User | undefined> {
 
-//type UserSubmit from models.d.ts
-//async returns a promise
-//Return type is User Response from models.d.ts
-//function may return undefined if try fails
-export async function loginUser(user: UserSubmit): Promise<User | undefined> {
-    try {
-        const response = await conduitAPI.post('/users/login', {user})
-        return (response.data as UserResponse).user
-    } catch(e){
-        console.error(e.message)
-    }
+            const response = await conduitAPI.post('/users/login', {user: credentials})
+            return (response.data as UserResponse).user
+     
 }
 
 //GET /api/profiles/:username
@@ -40,12 +33,10 @@ export async function fetchProfile(username: string): Promise<Profile> {
 
 //Fetch the current user for refresh
 export async function fetchUser(): Promise<User | undefined>{
-    try{
+   
         const response = await conduitAPI.get('/user')
         return (response.data as UserResponse).user
-    } catch(e){
-        console.error(e.message)
-    }
+
     
 }
 
@@ -59,14 +50,14 @@ export async function getGlobalFeed(feedType: string, username?: string): Promis
 
 //POST /api/profiles/:username/follow
 //Should get a profile - Use Profile | undefined or create new type
-export async function fetchProfileToFollow(username: string){
+export async function fetchProfileToFollow(username: string): Promise<Profile>{
     const response = await conduitAPI.post(`/profiles/${username}/follow`)
     return response.data.profile
 }
 
 //DELETE /api/profiles/:username/follow
 //Shoul get a profile - Use Profile | undefined or create new type
-export async function deleteProfileFromFollow(username: string){
+export async function deleteProfileFromFollow(username: string): Promise<Profile>{
     const response = await conduitAPI.delete(`/profiles/${username}/follow`)
     return response.data.profile
 }

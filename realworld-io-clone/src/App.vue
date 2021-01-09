@@ -1,30 +1,29 @@
 <template>
   <div id="app">
     <AppNavbar />
-    <router-view/>
+    <router-view />
     <AppFooter />
   </div>
 </template>
 
 <script lang="ts">
 ///////TODO/////////
-//   Sign in error handling
+//✅ Update Login Authentication
+//✅ Sign in error handling
 //   View - Article.vue/readmore
 //✅ GET User Articles - load only once
 //✅ GET Favorited Articles - load only once
 //✅ Profile - Show/Hide Favorite or User Artilces
-//   Follow User - POST /api/profiles/:username/follow
-//   DELETE /api/profiles/:username/follow 
+//✅ Follow User - POST /api/profiles/:username/follow
+//✅ DELETE /api/profiles/:username/follow 
 
-//Home - Show/Hide User Feed/Global Feed - GET /api/articles/feed - auth required use jwt 
+//✅ Home - Show/Hide User Feed/Global Feed - GET /api/articles/feed - auth required use jwt 
 //POST Create Article - POST /api/articles - 
 //POST Update Article if User - JWT Token set in users module login()
 //Editor prefill info with article info, Redirect from /editor/articlename to /article/articlename
 //POST Add comment to an article - POST /api/articles/:slug/comments
 //DELETE Comment from article if  user
 //DELETE - Article if User 
-
-
 
 //POST for signup - create new user
 //POST Create New Article

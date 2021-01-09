@@ -1,32 +1,32 @@
 <template>
     <nav class="navbar navbar-light">
       <div class="container">
-        <a class="navbar-brand" href="index.html">conduit</a>
+        <router-link class="navbar-brand" :to="{name: 'Home'}">conduit</router-link>
         <ul class="nav navbar-nav pull-xs-right">
           <li class="nav-item">
             <!-- Add "active" class when you're on that page" -->
-            <a class="nav-link active" href="">Home</a>
+            <router-link class="nav-link active" :to="{name: 'Home'}">Home</router-link>
           </li>
-          <li v-if="username" class="nav-item">
+          <li v-if="currentUser" class="nav-item">
             <router-link class="nav-link" :to="{name: 'editor'}">
               <i class="ion-compose"></i>&nbsp;New Post
             </router-link>
           </li>
-          <li v-if="username" class="nav-item">
+          <li v-if="currentUser" class="nav-item">
             <router-link class="nav-link" :to="{name: 'settings'}">
               <i class="ion-gear-a"></i>&nbsp;Settings
             </router-link>
           </li>
-          <li v-if="username" class="nav-item">
-            <router-link class="nav-link" :to="'/@'+username">
-              {{username}}
+          <li v-if="currentUser" class="nav-item">
+            <router-link class="nav-link" :to="'/@'+currentUser">
+              {{currentUser}}
             </router-link>
           </li>
-          <li v-if="!username" class="nav-item">
-            <router-link class="nav-link" to="/register">Sign up</router-link>
+          <li v-if="!currentUser" class="nav-item">
+            <router-link class="nav-link" :to="{name: 'register'}">Sign up</router-link>
           </li>
-          <li v-if="!username" class="nav-item">
-            <router-link class="nav-link" to="/login">Sign in</router-link>
+          <li v-if="!currentUser" class="nav-item">
+            <router-link class="nav-link" :to="{name: 'login'}">Sign in</router-link>
           </li>
         </ul>
       </div>
@@ -40,7 +40,7 @@ import users from '@/store/modules/users'
 export default class AppNavbar extends Vue {
   
   //computed
-  get username(){
+  get currentUser(){
     return users.username
   }
 }

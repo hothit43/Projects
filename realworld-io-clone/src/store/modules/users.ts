@@ -1,19 +1,10 @@
-import { UserForUpdate } from './../models.d';
 import { VuexModule, Module, getModule, Action, Mutation } from 'vuex-module-decorators'
 import store from '@/store'
-import {User, Profile, UserSubmit} from '../models'
-import { deleteProfileFromFollow, fetchProfile, fetchProfileToFollow, fetchUser, loginUser, setJWT, updateUser } from '../api'
+import {User, Profile, UserSubmit, Errors, UserForUpdate} from '../models'
+import JwtService from './jwt.service'
+import { clearJWT, deleteProfileFromFollow, fetchProfile, fetchProfileToFollow, fetchUser, loginUser, setJWT, updateUser } from '../api'
+import jwtService from './jwt.service'
 
-//Regular Method without vuex-module-decorator
-// const moduleA = {
-//     state: { ... },
-//     mutations: { ... },
-//     actions: { ... },
-//     getters: { ... }
-// }
-  
-
-//vuex-module-decorators allows to define modules like typescript classes
 @Module({
     namespaced: true,
     name: 'users',
@@ -24,28 +15,41 @@ import { deleteProfileFromFollow, fetchProfile, fetchProfileToFollow, fetchUser,
 export class UsersModule extends VuexModule {
     user: User | null = null
     profile?: Profile | null = null
-    
+    errors: object | null = null
+    token = jwtService.getToken()
     //Getter
     get username(){
         //if user exists send user.username else send null
         return this.user && this.user.username || null
     }
     
+    get isAuthenticated(){
+        return !!this.token
+    }
 
-    @Action({commit: 'setUser'})
-    //UserSubmit Type from models.d.ts
-    async login(userSubmit: UserSubmit){
-        try {
-            //loginUser() from api.ts
-            const user = await loginUser(userSubmit)
-            if(user) setJWT(user.token)
-            //console.log(user)
-            return user 
-        } catch(e) {
-            console.error(e)
-            throw new Error('Invalid username or password')
+    @Action
+        async login(userSubmit: UserSubmit){
+            try{
+                const user = await loginUser(userSubmit)
+                this.context.commit('setUser', user)
+            } catch(e){
+                this.context.commit('setError', e)
+            }   
         }
- 
+    
+    @Action
+    async loadUser(){
+        if (this.token) {
+            try{
+                setJWT(this.token)
+                const user = await fetchUser()
+                this.context.commit('setUser', user)
+            } catch(e){
+                this.context.commit('setError', e)
+            }
+        } else {
+            this.context.commit('purge')
+        }
     }
 
     @Action({commit: 'setProfile'})
@@ -53,19 +57,12 @@ export class UsersModule extends VuexModule {
         const profile = await fetchProfile(username)
         return profile
     }
-
-    //load the current user to load from api to get updated data
-    async loadUser(){
-        const user = await fetchUser()
-        return { user }
-    }
     
     @Action({commit: 'setSelfProfile'})
     async updateSelfProfile(userUpdateFields: UserForUpdate){
         const user = await updateUser(userUpdateFields)
         return user
     }
-
     //Follow user
     @Action({commit: 'setProfile'})
     async followUser(username: string){
@@ -81,7 +78,25 @@ export class UsersModule extends VuexModule {
     }
 
     //mutate/set above user object
-    @Mutation setUser(user: User){this.user = user}
+    @Mutation setUser(user: User){
+            this.user = user
+            JwtService.saveToken(user.token)
+            setJWT(this.token)
+            
+    }
+    @Mutation 
+    setError(error: Errors ){
+        this.errors = {...error.response.data.errors}
+        clearJWT()
+        JwtService.destroyToken()
+    }
+    @Mutation
+    purge(){
+        this.user = null
+        this.errors = null
+        jwtService.destroyToken()
+        clearJWT()
+    }
     @Mutation setProfile(profile: Profile){this.profile = profile}
     @Mutation setSelfProfile(user: User){this.user = user}
 }

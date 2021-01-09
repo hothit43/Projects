@@ -1,5 +1,16 @@
 //file name is shorthand for models-datatypes: Here I define my datatypes
 //Interfaces are rules for classes - these are the patterns for classes implementing these interfaces
+
+
+export interface Errors {
+  config: object;
+  isAxios: boolean;
+  request?:string;
+  response: {
+    [key: string]: array<string>
+  } 
+}
+
 export interface Profile {
     username: string;
     bio?: string;

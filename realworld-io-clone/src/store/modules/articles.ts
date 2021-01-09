@@ -16,7 +16,6 @@ interface TypeFeed {
     username?: string;
 }
 
-
 @Module({
     dynamic: true,
     namespaced: true,
@@ -32,7 +31,6 @@ class ArticlesModule extends VuexModule {
     //context.commit('mutation', 'return val as payload')
     @Action({commit: 'setFeed'})
     async refreshGlobalFeed( {feedType, username}: TypeFeed) {
-        console.log('feedtype: ', feedType, 'username: ', username)
         const feed = await api.getGlobalFeed(feedType, username)
         return feed.articles
     }

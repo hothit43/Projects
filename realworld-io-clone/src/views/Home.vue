@@ -15,20 +15,20 @@
                 <ul class="nav nav-pills outline-active">
                     <li class="nav-item">
                     <a @click.prevent="feedArticles()" 
-                    :class="['nav-link', {'active': followList}, {'disabled': !followFeed[0] && !username}]"
+                    :class="['nav-link', {'active': showHideFeed}, {'disabled': !followFeed[0] && !username}]"
                     :style="[!followFeed[0] && !username ? {'pointer-events' : 'none'} : '']"
                     >Your Feed</a>
                     </li>
                     <li class="nav-item">
-                    <a @click.prevent="followList = !followList"
+                    <a @click.prevent="showHideFeed = !showHideFeed"
                     :style="[!followFeed[0] ? {'pointer-events' : 'none'} : '']"
-                    :class="['nav-link', {'active': !followList}]">Global Feed</a>
+                    :class="['nav-link', {'active': !showHideFeed}]">Global Feed</a>
                     </li>
                 </ul>
                 </div>
 
-                <ArticlePreview v-show="!followList" v-for="article in feed" :article="article" :key="`global-${article.slug}`" />
-                <ArticlePreview v-show="followList" v-for="article in followFeed" :article="article" :key="`following-${article.slug}`" />
+                <ArticlePreview v-show="!showHideFeed" v-for="article in feed" :article="article" :key="`global-${article.slug}`" />
+                <ArticlePreview v-show="showHideFeed" v-for="article in followFeed" :article="article" :key="`following-${article.slug}`" />
 
 
             </div>
@@ -67,7 +67,7 @@ import users from '@/store/modules/users'
     }
 })
 export default class extends Vue {
-    followList = false
+    showHideFeed = false
     feed: Article[] = []
     followFeed: Article[] = []
     
@@ -76,15 +76,19 @@ export default class extends Vue {
     }
 
     feedArticles(){
-        if(!this.followFeed[0] && this.username) articles.refreshGlobalFeed({feedType: 'feed', username: this.username}).then(() => this.followFeed = articles.feed)
-        this.followList = !this.followList
+        this.showHideFeed = !this.showHideFeed
     }
     
-    created(){
-        if(this.username) articles.refreshGlobalFeed({feedType: 'feed', username: this.username}).then(() => this.followFeed = articles.feed).then(() => this.followList = true)
+    async created(){
+        console.log('username: ', this.username)
+        if(this.username){
+            await articles.refreshGlobalFeed({feedType: 'feed', username: this.username})
+            this.followFeed = articles.feed
+            this.showHideFeed = true
+        }
 
-        articles.refreshGlobalFeed({feedType:'global'})
-        .then(() => this.feed = articles.feed)
+        await articles.refreshGlobalFeed({feedType:'global'})
+        this.feed = articles.feed
     }
 }    
 
