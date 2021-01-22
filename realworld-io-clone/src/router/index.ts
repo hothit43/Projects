@@ -58,7 +58,7 @@ const router = new VueRouter({
   routes
 })
 
-router.beforeEach((to, from, next) => {
+router.beforeEach( async (to, from, next) => {
   users.loadUser()
     .then(() => {
       console.log(users.user)

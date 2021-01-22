@@ -37,6 +37,11 @@ export class UsersModule extends VuexModule {
             }   
         }
     
+    @Action({commit: 'purge'})
+        logout(): void {
+            return
+        }
+
     @Action
     async loadUser(){
         if (this.token) {
@@ -78,10 +83,12 @@ export class UsersModule extends VuexModule {
     }
 
     //mutate/set above user object
-    @Mutation setUser(user: User){
+    @Mutation
+    async setUser(user: User){
             this.user = user
-            JwtService.saveToken(user.token)
-            setJWT(this.token)
+            setJWT(user.token)
+            await JwtService.saveToken(user.token)
+            this.token = jwtService.getToken()
             
     }
     @Mutation 
@@ -90,8 +97,10 @@ export class UsersModule extends VuexModule {
         clearJWT()
         JwtService.destroyToken()
     }
+
     @Mutation
     purge(){
+        this.token = ''
         this.user = null
         this.errors = null
         jwtService.destroyToken()

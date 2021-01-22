@@ -26,6 +26,7 @@
                     Log In
                 </button>
                 </form>
+                
             </div>
         </div>
     </div>
@@ -52,5 +53,7 @@ export default class Login extends Vue {
         await users.login({email: this.email, password: this.password})
         return !this.isAuthenticated || this.$router.push({name: "Home"})
     }
+
+    
 }
 </script>

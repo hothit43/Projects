@@ -9,7 +9,8 @@
 <script lang="ts">
 ///////TODO/////////
 //✅ Update Login Authentication
-//✅ Sign in error handling
+//✅ Sign in basic error handling
+//✅ Logout Method
 //   View - Article.vue/readmore
 //✅ GET User Articles - load only once
 //✅ GET Favorited Articles - load only once

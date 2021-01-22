@@ -76,15 +76,20 @@ export default class extends Vue {
     }
 
     feedArticles(){
-        this.showHideFeed = !this.showHideFeed
+        this.followFeed.length > 0 
+        ? this.showHideFeed = !this.showHideFeed : this.showHideFeed = false
     }
     
     async created(){
         console.log('username: ', this.username)
         if(this.username){
             await articles.refreshGlobalFeed({feedType: 'feed', username: this.username})
-            this.followFeed = articles.feed
-            this.showHideFeed = true
+            .then(()=>{
+                this.followFeed = articles.feed
+            })
+            .then(() => {
+                if(this.followFeed.length > 0) this.showHideFeed = true
+            })
         }
 
         await articles.refreshGlobalFeed({feedType:'global'})
